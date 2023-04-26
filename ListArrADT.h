@@ -1,5 +1,5 @@
-#ifndef QueueADT_H
-#define QueueADT_H
+#ifndef ListArrADT_H
+#define ListArrADT_H
 #include<iostream>
 using namespace std;
 template<typename T>
