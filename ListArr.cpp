@@ -143,7 +143,77 @@ void ListArr<T>::insert_right(T v){
 }
 template<typename T>
 void ListArr<T>::insert(T v, int i){
-
+    ResumeNode* temp = Head;
+    Node* temp2;
+    bool recontruir = false;
+    while(i<=size()){
+        if (temp->LeftR != nullptr){
+            if (i+1<=temp->LeftR->capacidad&&temp->LeftR->usado<=i+1){
+                temp = temp->LeftR;
+                temp->usado++;
+                if (temp->capacidad<temp->usado){
+                    recontruir = true;
+                }
+            }else{
+                i = i - temp->LeftR->usado;
+                temp = temp->RigthR;
+                temp->usado++;
+                if (temp->capacidad<temp->usado){
+                    recontruir = true;
+                }
+            }
+        }else{
+            if (i+1<=temp->Left->capacidad&&temp->Left->usado<=i+1){
+                temp2 = temp->Left;
+                temp2->usado++;
+            }else{
+                i = i - temp->Left->usado;
+                temp2 = temp->Rigth;
+                temp2->usado++;
+            }
+            if (temp2->capacidad<temp2->usado){
+                recontruir = true;
+            }
+            if (!recontruir){
+                temp2->data[temp2->used-1] = v;
+                for (int j = 0; j < temp2->used-i-1; j++){
+                    T temp3 = temp2->data[temp2->used-1-j];
+                    temp2->data[temp2->used-1-j] = temp2->data[temp2->used-2-j];
+                    temp2->data[temp2->used-2-j] = temp3;
+                }
+            }else{
+                if (temp2->next!=nullptr&&temp2->next->usado<temp2->next->capacidad){
+                    T temp4 = temp2->data[temp2->used-1];
+                    temp2->data[temp2->used-1] = v;
+                    for (int j = 0; j < temp2->used-i-1; j++){
+                        T temp3 = temp2->data[temp2->used-1-j];
+                        temp2->data[temp2->used-1-j] = temp2->data[temp2->used-2-j];
+                        temp2->data[temp2->used-2-j] = temp3;
+                    }
+                    temp2 = temp2->next;                    
+                    temp2->data[temp2->used-1] = v;
+                    for (int j = 0; j < temp2->used-1; j++){
+                        T temp3 = temp2->data[temp2->used-1-j];
+                        temp2->data[temp2->used-1-j] = temp2->data[temp2->used-2-j];
+                        temp2->data[temp2->used-2-j] = temp3;
+                    }
+                }else{
+                    Node* newNode = new Node(capacity);  
+                    newNode->data[0] = temp2->data[temp2->used-1];
+                    newNode->usado++;
+                    temp2->data[temp2->used-1] = v;
+                    for (int j = 0; j < temp2->used-i-1; j++){
+                        T temp3 = temp2->data[temp2->used-1-j];
+                        temp2->data[temp2->used-1-j] = temp2->data[temp2->used-2-j];
+                        temp2->data[temp2->used-2-j] = temp3;
+                    }
+                    newNode->next = temp2->next;
+                    temp2->next = newNode;
+                    CTree();
+                }
+            }
+        }
+    }
 }
 template<typename T>
 void ListArr<T>::print(){
