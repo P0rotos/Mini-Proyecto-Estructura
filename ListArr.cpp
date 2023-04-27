@@ -221,7 +221,26 @@ void ListArr<T>::print(){
 }
 template<typename T>
 bool ListArr<T>::find(T v){
-
+    Node* current;
+    ResumeNode* temp = Head;
+    while(temp->Left == nullptr){
+        temp = temp->LeftR;
+    }
+    current = temp->Left;
+    bool flag = false;
+    while(current->next != nullptr){
+        for (int i = 0; i < current->usado; i++){
+            if (current->data[i]==v){
+                flag = true;
+                break;
+            }
+        }
+        if (flag){
+            break;
+        }
+        current = current->next;
+    }
+    return flag
 }
 template<typename T>
 T ListArr<T>::delete_left(){
