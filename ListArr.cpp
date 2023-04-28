@@ -251,15 +251,40 @@ T ListArr<T>::delete_left(){
         }else{
             temp = temp->RightR;
         }
-        temp->Left->usado--;
-
-        return(temp->Left->data[temp->Left->usado]);
     }
     temp->Left->usado--;
     for (int i = 0; i < temp->Left->usado; i++){                        
         T temp2 = temp->data[i];
         temp->data[i] = temp->data[i+1];
         temp->data[i+1] = temp2;
+    }
+    if (temp->Left->usado == 0){ 
+        T out =  temp->Left->data[temp->Left->usado];
+        Node* First;
+        ResumeNode* temp3 = Head;
+        while(temp3->Left == nullptr){
+            temp3 = temp3->LeftR;
+        }
+        First = temp3->Left;
+        if (First->usado!=0){
+            while(First->next->usado!=0){
+                First = First->next;
+            }
+            if (First->next->next != nullptr){
+                First->next = First->next->next
+            }
+        }else{
+            if (temp3->Right != nullptr){           
+                Node* aux;
+                aux = temp3->Left;
+                temp3->Left = temp3->Right;
+                delete aux;
+            }else{
+                return(false);
+            }
+        }
+        delete temp->Left;
+        CTree();
     }
     return(temp->Left->data[temp->Left->usado]);
 }
@@ -273,6 +298,49 @@ T ListArr<T>::delete_right(){
             temp = temp->LeftR;
         }
     }
-    temp->Left->usado--;
-    return(temp->Left->data[temp->Left->usado]);
+    if (temp->Right != nullptr && temp->Right->usado != 0){
+        Node* act = temp->Right;
+    }else{
+        Node* act = temp->Left;
+    }
+    act->usado--;
+    if (act->usado == 0){ 
+        T out =  act->data[act->usado];
+        Node* First;
+        ResumeNode* temp3 = Head;
+        while(temp3->Left == nullptr){
+            temp3 = temp3->LeftR;
+        }
+        First = temp3->Left;
+        if (First->usado!=0){
+            while(First->next->usado!=0){
+                First = First->next;
+            }
+            if (First->next->next != nullptr){
+                First->next = First->next->next
+            }
+        }else{
+            if (temp3->Right != nullptr){           
+                Node* aux;
+                if (temp->Right->usado == 0){
+                    aux = temp3->Rigth;
+                    temp3->Left = temp3->Right;
+                    delete aux;
+                }else{
+                    aux = temp3->Left;
+                    temp3->Left = temp3->Right;
+                    delete aux;
+                }
+            }else{
+                return(false);
+            }
+        }    
+        if (temp->Right != nullptr && temp->Right->usado == 0){
+            delete temp->Right;
+        }else{
+            delete temp->Left;
+        }
+        CTree();
+    }
+    return(act->data[act->usado]);
 }
