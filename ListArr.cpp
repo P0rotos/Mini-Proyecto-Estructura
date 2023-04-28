@@ -244,9 +244,35 @@ bool ListArr<T>::find(T v){
 }
 template<typename T>
 T ListArr<T>::delete_left(){
+    ResumeNode* temp = Head;
+    while(temp->Left != nullptr){
+        if (temp->LeftR->usado != 0){
+            temp = temp->LeftR;
+        }else{
+            temp = temp->RightR;
+        }
+        temp->Left->usado--;
 
+        return(temp->Left->data[temp->Left->usado]);
+    }
+    temp->Left->usado--;
+    for (int i = 0; i < temp->Left->usado; i++){                        
+        T temp2 = temp->data[i];
+        temp->data[i] = temp->data[i+1];
+        temp->data[i+1] = temp2;
+    }
+    return(temp->Left->data[temp->Left->usado]);
 }
 template<typename T>
 T ListArr<T>::delete_right(){
-
+    ResumeNode* temp = Head;
+    while(temp->Left != nullptr){
+        if (temp->RigthR->usado != 0){
+            temp = temp->RigthR;
+        }else{
+            temp = temp->LeftR;
+        }
+    }
+    temp->Left->usado--;
+    return(temp->Left->data[temp->Left->usado]);
 }
