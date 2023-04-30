@@ -245,53 +245,59 @@ bool ListArr<T>::find(T v){
 template<typename T>
 T ListArr<T>::delete_left(){
     ResumeNode* temp = Head;
-    while(temp->Left != nullptr){
+    while(temp->Left == nullptr){
         if (temp->LeftR->usado != 0){
             temp = temp->LeftR;
         }else{
             temp = temp->RightR;
         }
     }
-    temp->Left->usado--;
-    for (int i = 0; i < temp->Left->usado; i++){                        
-        T temp2 = temp->data[i];
-        temp->data[i] = temp->data[i+1];
-        temp->data[i+1] = temp2;
-    }
-    if (temp->Left->usado == 0){ 
-        T out =  temp->Left->data[temp->Left->usado];
-        Node* First;
-        ResumeNode* temp3 = Head;
-        while(temp3->Left == nullptr){
-            temp3 = temp3->LeftR;
+    if (temp->Left->usado != 0){
+        temp->Left->usado--;
+        for (int i = 0; i < temp->Left->usado; i++){                        
+            T temp2 = temp->data[i];
+            temp->data[i] = temp->data[i+1];
+            temp->data[i+1] = temp2;
         }
-        First = temp3->Left;
-        if (First->usado!=0){
-            while(First->next->usado!=0){
-                First = First->next;
+        if (temp->Left->usado == 0){ 
+            T out =  temp->Left->data[temp->Left->usado];
+            Node* First;
+            ResumeNode* temp3 = Head;
+            while(temp3->Left == nullptr){
+                temp3 = temp3->LeftR;
             }
-            if (First->next->next != nullptr){
-                First->next = First->next->next
-            }
-        }else{
-            if (temp3->Right != nullptr){           
-                Node* aux;
-                aux = temp3->Left;
-                temp3->Left = temp3->Right;
-                delete aux;
+            First = temp3->Left;
+            if (First->usado!=0){
+                while(First->next->usado!=0){
+                    First = First->next;
+                }
+                if (First->next->next != nullptr){
+                    First->next = First->next->next
+                }
             }else{
-                return(false);
+                if (temp3->Right != nullptr){           
+                    Node* aux;
+                    aux = temp3->Left;
+                    temp3->Left = temp3->Right;
+                    delete aux;
+                }
+            }
+            if (temp3->Right != nullptr){
+                delete temp->Left;
+                CTree();
+                return(out);
             }
         }
-        delete temp->Left;
-        CTree();
+        return(temp->Left->data[temp->Left->usado]);
+    }else{
+        cout << "No hay datos";
+        return(NULL);
     }
-    return(temp->Left->data[temp->Left->usado]);
 }
 template<typename T>
 T ListArr<T>::delete_right(){
     ResumeNode* temp = Head;
-    while(temp->Left != nullptr){
+    while(temp->Left == nullptr){
         if (temp->RigthR->usado != 0){
             temp = temp->RigthR;
         }else{
@@ -303,44 +309,29 @@ T ListArr<T>::delete_right(){
     }else{
         Node* act = temp->Left;
     }
-    act->usado--;
-    if (act->usado == 0){ 
-        T out =  act->data[act->usado];
-        Node* First;
-        ResumeNode* temp3 = Head;
-        while(temp3->Left == nullptr){
-            temp3 = temp3->LeftR;
-        }
-        First = temp3->Left;
-        if (First->usado!=0){
-            while(First->next->usado!=0){
-                First = First->next;
+    if (act->usado == 0){
+        act->usado--;
+        if (act->usado == 0){ 
+            T out =  act->data[act->usado];
+            Node* First;
+            ResumeNode* temp3 = Head;
+            while(temp3->Left == nullptr){
+                temp3 = temp3->LeftR;
             }
-            if (First->next->next != nullptr){
-                First->next = First->next->next
-            }
-        }else{
-            if (temp3->Right != nullptr){           
-                Node* aux;
-                if (temp->Right->usado == 0){
-                    aux = temp3->Rigth;
-                    temp3->Left = temp3->Right;
-                    delete aux;
-                }else{
-                    aux = temp3->Left;
-                    temp3->Left = temp3->Right;
-                    delete aux;
+            First = temp3->Left;
+            if (First->usado!=0){
+                while(First->next->usado!=0){
+                    First = First->next;
                 }
-            }else{
-                return(false);
+                First->next = nullptr;
+                delete act;
             }
-        }    
-        if (temp->Right != nullptr && temp->Right->usado == 0){
-            delete temp->Right;
-        }else{
-            delete temp->Left;
+            CTree();
+            return(out);
         }
-        CTree();
+        return(act->data[act->usado]);
+    }else{
+        cout << "No hay datos";
+        return(NULL);
     }
-    return(act->data[act->usado]);
 }
