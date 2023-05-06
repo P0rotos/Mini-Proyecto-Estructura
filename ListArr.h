@@ -4,7 +4,7 @@
 #include "ListArrADT.h"
 using namespace std;
 template<typename T>
-class ListArr: public ListArrADT{
+class ListArr: public ListArrADT<T>{
 private:
 	struct Node{
         T* data;
@@ -19,15 +19,15 @@ private:
 		}
 	};
     struct ResumeNode{
-		Node* Rigth;
+		Node* Right;
         Node* Left;
-        ResumeNode* RigthR;
+        ResumeNode* RightR;
         ResumeNode* LeftR;
         int capacidad;
         int usado;
 		ResumeNode(){
-			this->Rigth = nullptr;
-			this->RigthR = nullptr;
+			this->Right = nullptr;
+			this->RightR = nullptr;
 			this->Left = nullptr;
 			this->LeftR = nullptr;
 			this->usado = 0;

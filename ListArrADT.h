@@ -3,7 +3,7 @@
 #include<iostream>
 using namespace std;
 template<typename T>
-class QueueADT{
+class ListArrADT{
 	virtual int size() = 0;
 	virtual void insert_left(T v) = 0;
 	virtual void insert_right(T v) = 0;
