@@ -131,7 +131,7 @@ ListArr<T>::~ListArr(){
 }
 template<typename T>
 int ListArr<T>::size(){
-
+	return(Head->usado+1);
 }
 template<typename T>
 void ListArr<T>::insert_left(T v){
@@ -217,7 +217,19 @@ void ListArr<T>::insert(T v, int i){
 }
 template<typename T>
 void ListArr<T>::print(){
-
+ Node* current;
+    ResumeNode* temp = Head;
+    while(temp->Left == nullptr){
+        temp = temp->LeftR;
+    }
+    current = temp->Left;
+    bool flag = false;
+    while(current->next != nullptr){
+        for (int i = 0; i < current->usado; i++){
+            cout << current->data[i] <<" ";
+        }
+        current = current->next;
+    }
 }
 template<typename T>
 bool ListArr<T>::find(T v){
