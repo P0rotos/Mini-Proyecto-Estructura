@@ -4,14 +4,18 @@
 using namespace std;
 int main(int argc, char const *argv[]){
     ListArr<int> A(10);
-    A.insert(10,0);
-    A.insert(10,0);
-    A.insert(10,0);
-    A.insert(10,0);
-    A.insert(10,0);
-    A.insert(10,0);
-    A.insert(10,0);
-    A.insert(10,0);
-    A.insert(10,0);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.insert_left(10);
+    A.print();
     return 0;
 }

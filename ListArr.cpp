@@ -1,5 +1,6 @@
 #include<iostream>
 #include<cmath>
+#include<queue>
 #include "ListArr.h"
 using namespace std;
 template<typename T>
@@ -21,6 +22,7 @@ void ListArr<T>::CTree(){
         temp = temp->LeftR;
     }
     First = temp->Left;
+    cout << "Entro";
     DTree(Head);
     Node* current = First;
     int count = 0;
@@ -33,19 +35,19 @@ void ListArr<T>::CTree(){
     }else{
         count = (int)((log2(count))+1);
     }
+    cout << "Entro";
     CTreehelp(Head, count);
-    temp = CTreeFreeRN(Head);
+    queue<ResumeNode*> Nqueue;
+    cout << "Entro";
+    Nqueue = CTreeFreeRN(Head, Nqueue);
     while(First != nullptr){
-        if (temp->Right != nullptr){
-            temp = CTreeFreeRN(Head);
-        }else{
-            if (temp->Left == nullptr){
-                temp->Left = First;
-                First = First->next;
-            }else{
-                temp->Right = First;
-                First = First->next;
-            }
+        temp = Nqueue.front();
+        Nqueue.pop();
+        temp->Left = First;
+        First = First->next;
+        temp->Right = First;
+        if (First != nullptr){
+            First = First->next;
         }
     }
     CTreeAsign(Head);
@@ -57,30 +59,24 @@ void ListArr<T>::CTreehelp(ResumeNode* RN, int i){
         ResumeNode* L = new ResumeNode();
         RN->RightR = R;
         RN->LeftR = L;
-        CTreehelp(R, i--);
-        CTreehelp(L, i--);
+        i--;
+        CTreehelp(R, i);
+        CTreehelp(L, i);
     }
 }
 template<typename T>
-typename ListArr<T>::ResumeNode* ListArr<T>::CTreeFreeRN(ResumeNode* RN){
-    ResumeNode* temp;
+queue<typename ListArr<T>::ResumeNode*> ListArr<T>::CTreeFreeRN(ResumeNode* RN, queue<ResumeNode*> NQ){
+    cout << "entro";
     if (RN->LeftR != nullptr){
-        temp = CTreeFreeRN(RN->LeftR);
-        if (temp != nullptr){
-            return(temp);
-        }
+        NQ = CTreeFreeRN(RN->LeftR, NQ);
     }
     if (RN->RightR != nullptr){
-        temp = CTreeFreeRN(RN->RightR);
-        if (temp != nullptr){
-            return(temp);
-        }
+        NQ = CTreeFreeRN(RN->RightR, NQ);
     }
-    if (RN->Right == nullptr && RN->RightR == nullptr){
-        return(RN);
-    }else{
-        return(nullptr);
+    if (RN->RightR == nullptr){
+        NQ.push(RN);
     }
+    return(NQ);
 }
 template<typename T>
 void ListArr<T>::CTreeAsign(ResumeNode* RN){
@@ -131,15 +127,83 @@ ListArr<T>::~ListArr(){
 }
 template<typename T>
 int ListArr<T>::size(){
-    return(0);
+    return(Head->usado);
 }
 template<typename T>
 void ListArr<T>::insert_left(T v){
-
+    ResumeNode* RN = Head;
+    bool reconstruir = false;
+    RN->usado++;
+    while (RN->LeftR !=  nullptr){
+        RN = RN->LeftR;
+        RN->usado++;
+    }
+    if (RN->Left->usado < RN->Left->capacidad) {
+        for (int i = RN->Left->usado; i > 0; i--) {
+            RN->Left->data[i] = RN->Left->data[i-1];
+        }
+        RN->Left->data[0] = v;
+        RN->Left->usado++;
+    }else{
+        if (RN->Left->next != nullptr && RN->Left->next->usado < RN->Left->next->capacidad){        
+            for (int i = RN->Left->next->usado; i > 0; i--) {
+                RN->Left->next->data[i] = RN->Left->next->data[i-1];
+            }
+            RN->Left->next->data[0] = RN->Left->data[RN->Left->usado-1];
+            RN->Left->next->usado++;        
+            for (int i = RN->Left->usado-1; i > 0; i--) {
+                RN->Left->data[i] = RN->Left->data[i-1];
+            }
+            RN->Left->data[0] = v;
+        }else{         
+            Node* newNode = new Node(capacity);
+            newNode->next = RN->Left->next;
+            RN->Left->next = newNode;
+            newNode->data[0] = RN->Left->data[RN->Left->usado-1];
+            newNode->usado++;        
+            for (int i = RN->Left->usado-1; i > 0; i--) {
+                RN->Left->data[i] = RN->Left->data[i-1];
+            }
+            RN->Left->data[0] = v;
+            CTree();
+        }
+    }
 }
 template<typename T>
 void ListArr<T>::insert_right(T v){
-
+    ResumeNode* RN = Head;
+    RN->usado++;
+    while(RN->Left == nullptr){
+        if (RN->RightR != nullptr && RN->RightR->usado > 0){
+            RN = RN->RightR;
+            RN->usado++;
+        }else{
+            RN = RN->LeftR;
+            RN->usado++;
+        }
+    }
+    Node* act;
+    if (RN->Right != nullptr && RN->Right->usado > 0){
+        act = RN->Right;
+    }else{
+        act = RN->Left;
+    }
+    if(act->usado < act->capacidad){
+        act->data[act->usado] = v;
+        act->usado++;
+    }else{
+        if (act->next != nullptr && act->next->usado < act->next->capacidad){
+            act->next->data[act->next->usado] = v;
+            act->next->usado++;
+        }else{
+            Node* Nuevo = new Node(capacity);
+            Nuevo->data[0] = v;
+            Nuevo->usado++;
+            Nuevo->next = act->next;
+            act->next = Nuevo;
+            CTree();
+        }
+    }
 }
 template<typename T>
 void ListArr<T>::insert(T v, int i){
@@ -216,8 +280,19 @@ void ListArr<T>::insert(T v, int i){
     }
 }
 template<typename T>
-void ListArr<T>::print(){
-
+void ListArr<T>::print(){ 
+    Node* current;
+    ResumeNode* temp = Head;
+    while(temp->Left == nullptr){
+        temp = temp->LeftR;
+    }
+    current = temp->Left;
+    do{
+        for (int i = 0; i < current->usado; i++){
+            cout << current->data[i] <<" ";
+        }
+        current = current->next;
+    }while(current != nullptr);
 }
 template<typename T>
 bool ListArr<T>::find(T v){
@@ -228,7 +303,7 @@ bool ListArr<T>::find(T v){
     }
     current = temp->Left;
     bool flag = false;
-    while(current->next != nullptr){
+    while(current != nullptr){
         for (int i = 0; i < current->usado; i++){
             if (current->data[i]==v){
                 flag = true;

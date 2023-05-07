@@ -1,6 +1,7 @@
 #ifndef ListArr_H
 #define ListArr_H
 #include<iostream>
+#include<queue>
 #include "ListArrADT.h"
 using namespace std;
 template<typename T>
@@ -40,7 +41,7 @@ private:
 	void DTree(ResumeNode* RN);//Destruye el arbol de ResumeNode dejando solo al ResumeNode Head
 	void CTree(); //Crea y da valores a capacidad y usado en el arbol de nodos Resumenes
 	void CTreehelp(ResumeNode* RN, int i); //crea los ResumeNode y los une en un arbol binario de altura i (Cuidado que si se quiere usar este no elimina el ARbol anterio y como se cambia LeftR y RightR se van a quedar los nodos del arbol anterior ocupando espacio e inaccesible por lo que no podran ser borrados)
-	ResumeNode* CTreeFreeRN(ResumeNode* RN); //Busca ResumeNode que no este ligado a otro ResumeNode(hojas) en el arbol y que tampoco esten completos osea no tengo un Node
+	queue<ResumeNode*> CTreeFreeRN(ResumeNode* RN, queue<ResumeNode*> NQ); //Busca ResumeNode que no este ligado a otro ResumeNode(hojas) en el arbol y que tampoco esten completos osea no tengo un Node
 	void CTreeAsign(ResumeNode* RN); //Pasa por todo el arbol de ResumeNode Recien Construido (con usado y capacidad 0) y va sumando los valores de a los nodos uno en unohasta que cada uno tenga su valor correspondiente (notar que no sirve si los ResumeNode ya tenian un valor previamente)
 public:
 	ListArr(int capacity);
