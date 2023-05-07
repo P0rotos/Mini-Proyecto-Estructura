@@ -223,7 +223,6 @@ void ListArr<T>::print(){
         temp = temp->LeftR;
     }
     current = temp->Left;
-    bool flag = false;
     while(current->next != nullptr){
         for (int i = 0; i < current->usado; i++){
             cout << current->data[i] <<" ";
