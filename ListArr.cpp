@@ -22,8 +22,13 @@ void ListArr<T>::CTree(){
         temp = temp->LeftR;
     }
     First = temp->Left;
-    cout << "Entro";
     DTree(Head);
+    Head->LeftR = nullptr;
+    Head->RightR = nullptr;
+    Head->Left = nullptr;
+    Head->Right = nullptr;
+    Head->capacidad = 0;
+    Head->usado = 0;
     Node* current = First;
     int count = 0;
     while(current != nullptr){
@@ -35,18 +40,18 @@ void ListArr<T>::CTree(){
     }else{
         count = (int)((log2(count))+1);
     }
-    cout << "Entro";
     CTreehelp(Head, count);
     queue<ResumeNode*> Nqueue;
-    cout << "Entro";
     Nqueue = CTreeFreeRN(Head, Nqueue);
     while(First != nullptr){
         temp = Nqueue.front();
         Nqueue.pop();
         temp->Left = First;
+        cout << temp->Left->usado << endl;
         First = First->next;
         temp->Right = First;
         if (First != nullptr){
+            cout << temp->Right->usado << endl;
             First = First->next;
         }
     }
@@ -55,6 +60,7 @@ void ListArr<T>::CTree(){
 template<typename T>
 void ListArr<T>::CTreehelp(ResumeNode* RN, int i){
     if (i>1){
+        cout << "HELP???";
         ResumeNode* R = new ResumeNode();
         ResumeNode* L = new ResumeNode();
         RN->RightR = R;
@@ -66,39 +72,47 @@ void ListArr<T>::CTreehelp(ResumeNode* RN, int i){
 }
 template<typename T>
 queue<typename ListArr<T>::ResumeNode*> ListArr<T>::CTreeFreeRN(ResumeNode* RN, queue<ResumeNode*> NQ){
-    cout << "entro";
     if (RN->LeftR != nullptr){
+        cout << "d";
         NQ = CTreeFreeRN(RN->LeftR, NQ);
     }
     if (RN->RightR != nullptr){
+        cout << "e";
         NQ = CTreeFreeRN(RN->RightR, NQ);
     }
     if (RN->RightR == nullptr){
+        cout << "f";
         NQ.push(RN);
     }
     return(NQ);
 }
 template<typename T>
 void ListArr<T>::CTreeAsign(ResumeNode* RN){
-    if (RN->usado == 0 && RN->RightR != nullptr){
+    RN->usado = 0;
+    RN->capacidad = 0;
+    if (RN->RightR != nullptr){
         CTreeAsign(RN->LeftR);
         CTreeAsign(RN->RightR);
     }
     if (RN->Left != nullptr){
-        RN->usado == RN->usado + RN->Left->usado;
-        RN->capacidad == RN->capacidad + RN->Left->capacidad;
+        cout << RN->usado <<" "<<RN->capacidad<<endl;
+        RN->usado = RN->usado + RN->Left->usado;
+        RN->capacidad = RN->capacidad + RN->Left->capacidad;
+        cout << RN->usado <<" "<<RN->capacidad<<endl;
     }
     if (RN->Right != nullptr){
-        RN->usado == RN->usado + RN->Right->usado;
-        RN->capacidad == RN->capacidad + RN->Right->capacidad;
+        cout << RN->usado <<" "<<RN->capacidad<<endl;
+        RN->usado = RN->usado + RN->Right->usado;
+        RN->capacidad = RN->capacidad + RN->Right->capacidad;
+        cout << RN->usado <<" "<<RN->capacidad<<endl;
     }    
     if (RN->LeftR != nullptr){
-        RN->usado == RN->usado + RN->LeftR->usado;
-        RN->capacidad == RN->capacidad + RN->LeftR->capacidad;
+        RN->usado = RN->usado + RN->LeftR->usado;
+        RN->capacidad = RN->capacidad + RN->LeftR->capacidad;
     }
     if (RN->RightR != nullptr){
-        RN->usado == RN->usado + RN->RightR->usado;
-        RN->capacidad == RN->capacidad + RN->RightR->capacidad;
+        RN->usado = RN->usado + RN->RightR->usado;
+        RN->capacidad = RN->capacidad + RN->RightR->capacidad;
     }
     
 }
@@ -210,71 +224,54 @@ void ListArr<T>::insert(T v, int i){
     ResumeNode* temp = Head;
     Node* temp2;
     bool recontruir = false;
-    while(i<=size()){
-        if (temp->LeftR != nullptr){
-            if (i+1<=temp->LeftR->capacidad&&temp->LeftR->usado<=i+1){
+    if (i<=this->size()){
+        temp->usado++;
+        while(temp->LeftR != nullptr){
+            if (i<=temp->LeftR->usado){
                 temp = temp->LeftR;
                 temp->usado++;
-                if (temp->capacidad<temp->usado){
-                    recontruir = true;
-                }
             }else{
                 i = i - temp->LeftR->usado;
                 temp = temp->RightR;
                 temp->usado++;
-                if (temp->capacidad<temp->usado){
-                    recontruir = true;
-                }
             }
+        }
+        if (i<=temp->Left->usado){
+            temp2 = temp->Left;
         }else{
-            if (i+1<=temp->Left->capacidad&&temp->Left->usado<=i+1){
-                temp2 = temp->Left;
-                temp2->usado++;
-            }else{
-                i = i - temp->Left->usado;
-                temp2 = temp->Right;
-                temp2->usado++;
+            i = i - temp->Left->usado;
+            temp2 = temp->Right;
+        }
+        if (temp2->usado < temp2->capacidad){
+            for (int j = i; j < temp2->usado; j++){
+                T temp3 = temp2->data[temp2->usado-j+i];
+                temp2->data[temp2->usado-j+i] = temp2->data[temp2->usado-1-j+i];
+                temp2->data[temp2->usado-1-j+i] = temp3;
             }
-            if (temp2->capacidad<temp2->usado){
-                recontruir = true;
-            }
-            if (!recontruir){
-                temp2->data[temp2->usado-1] = v;
-                for (int j = 0; j < temp2->usado-i-1; j++){
-                    T temp3 = temp2->data[temp2->usado-1-j];
-                    temp2->data[temp2->usado-1-j] = temp2->data[temp2->usado-2-j];
-                    temp2->data[temp2->usado-2-j] = temp3;
+            temp2->data[i] = v;
+            temp2->usado++;
+        }else{
+            if (temp2->next != nullptr && temp2->next->usado < temp2->next->capacidad){            
+                for (int j = temp2->next->usado; j > 0; j--) {
+                    temp2->next->data[j] = temp2->next->data[j-1];
                 }
-            }else{
-                if (temp2->next!=nullptr&&temp2->next->usado<temp2->next->capacidad){
-                    T temp4 = temp2->data[temp2->usado-1];
-                    temp2->data[temp2->usado-1] = v;
-                    for (int j = 0; j < temp2->usado-i-1; j++){
-                        T temp3 = temp2->data[temp2->usado-1-j];
-                        temp2->data[temp2->usado-1-j] = temp2->data[temp2->usado-2-j];
-                        temp2->data[temp2->usado-2-j] = temp3;
-                    }
-                    temp2 = temp2->next;                    
-                    temp2->data[temp2->usado-1] = v;
-                    for (int j = 0; j < temp2->usado-1; j++){
-                        T temp3 = temp2->data[temp2->usado-1-j];
-                        temp2->data[temp2->usado-1-j] = temp2->data[temp2->usado-2-j];
-                        temp2->data[temp2->usado-2-j] = temp3;
-                    }
-                }else{
-                    Node* newNode = new Node(capacity);  
-                    newNode->data[0] = temp2->data[temp2->usado-1];
-                    newNode->usado++;
-                    temp2->data[temp2->usado-1] = v;
-                    for (int j = 0; j < temp2->usado-i-1; j++){
-                        T temp3 = temp2->data[temp2->usado-1-j];
-                        temp2->data[temp2->usado-1-j] = temp2->data[temp2->usado-2-j];
-                        temp2->data[temp2->usado-2-j] = temp3;
-                    }
-                    newNode->next = temp2->next;
-                    temp2->next = newNode;
-                    CTree();
+                temp2->next->data[0] = temp2->data[temp2->usado-1];            
+                temp2->next->usado++;        
+                for (int j = temp2->usado-1; j > i; j--) {
+                    temp2->data[j] = temp2->data[j-1];
                 }
+                temp2->data[i] = v;
+            }else{         
+                Node* newNode = new Node(capacity);
+                newNode->next = temp2->next;
+                temp2->next = newNode;
+                newNode->data[0] = temp2->data[temp2->usado-1];
+                newNode->usado++;        
+                for (int j = temp2->usado-1; j > i; j--) {
+                    temp2->data[j] = temp2->data[j-1];
+                }
+                temp2->data[i] = v;
+                CTree();
             }
         }
     }
@@ -318,96 +315,84 @@ bool ListArr<T>::find(T v){
     return flag;
 }
 template<typename T>
-T ListArr<T>::delete_left(){
-    ResumeNode* temp = Head;
-    while(temp->Left == nullptr){
-        if (temp->LeftR->usado != 0){
-            temp = temp->LeftR;
-        }else{
-            temp = temp->RightR;
-        }
-    }
-    if (temp->Left->usado != 0){
-        temp->Left->usado--;
-        for (int i = 0; i < temp->Left->usado; i++){                        
-            T temp2 = temp->Left->data[i];
-            temp->Left->data[i] = temp->Left->data[i+1];
-            temp->Left->data[i+1] = temp2;
-        }
-        if (temp->Left->usado == 0){ 
-            T out =  temp->Left->data[temp->Left->usado];
-            Node* First;
-            ResumeNode* temp3 = Head;
-            while(temp3->Left == nullptr){
-                temp3 = temp3->LeftR;
-            }
-            First = temp3->Left;
-            if (First->usado!=0){
-                while(First->next->usado!=0){
-                    First = First->next;
-                }
-                if (First->next->next != nullptr){
-                    First->next = First->next->next;
-                }
-            }else{
-                if (temp3->Right != nullptr){           
-                    Node* aux;
-                    aux = temp3->Left;
-                    temp3->Left = temp3->Right;
-                    delete aux;
-                }
-            }
-            if (temp3->Right != nullptr){
-                delete temp->Left;
-                CTree();
-                return(out);
-            }
-        }
-        return(temp->Left->data[temp->Left->usado]);
-    }else{
-        cout << "No hay datos";
+T ListArr<T>::delete_left(){    
+    if (size()==0){
         return(0);
     }
+    ResumeNode* RN = Head;
+    RN->usado--;
+    while (RN->LeftR !=  nullptr){
+        RN = RN->LeftR;
+        RN->usado--;
+    }
+    Node* act= RN->Left;
+    T out;
+    if(act->usado-1 != 0){
+        out = act->data[0];
+        act->usado--;
+        for (int i = 0; i < act->usado; i++){
+            act->data[i] = act->data[i+1];
+        }
+    }else{        
+        out = act->data[0];
+        RN->Left = RN->Right;
+        delete act;
+        CTree();
+    }
+    return(out);
 }
 template<typename T>
 T ListArr<T>::delete_right(){
-    ResumeNode* temp = Head;
-    while(temp->Left == nullptr){
-        if (temp->RightR->usado != 0){
-            temp = temp->RightR;
+    if (size()==0){
+        return(0);
+    }
+    ResumeNode* RN = Head;
+    RN->usado--;
+    while(RN->Left == nullptr){
+        if (RN->RightR != nullptr && RN->RightR->usado > 0){
+            RN = RN->RightR;
+            RN->usado--;
         }else{
-            temp = temp->LeftR;
+            RN = RN->LeftR;
+            RN->usado--;
         }
     }
     Node* act;
-    if (temp->Right != nullptr && temp->Right->usado != 0){
-        act = temp->Right;
+    if (RN->Right != nullptr && RN->Right->usado > 0){
+        act = RN->Right;
     }else{
-        act = temp->Left;
+        act = RN->Left;
     }
-    if (act->usado == 0){
+    T out;
+    if(act->usado-1 != 0){
+        out = act->data[act->usado-1];
         act->usado--;
-        if (act->usado == 0){ 
-            T out =  act->data[act->usado];
-            Node* First;
-            ResumeNode* temp3 = Head;
-            while(temp3->Left == nullptr){
-                temp3 = temp3->LeftR;
-            }
-            First = temp3->Left;
-            if (First->usado!=0){
-                while(First->next->usado!=0){
+    }else{
+        out = act->data[0];
+        if (act == RN->Right){
+            delete act;
+            RN->Left->next = nullptr;
+        }else{
+            if(RN != Head){
+                Node* First;
+                ResumeNode* tempRN = Head;
+                while (tempRN->LeftR != nullptr){
+                    cout << "a";
+                    tempRN = tempRN->LeftR;
+                }
+                First = tempRN->Left;
+                while (First->next!=act){
+                    cout << "b";
                     First = First->next;
                 }
                 First->next = nullptr;
                 delete act;
             }
-            CTree();
-            return(out);
         }
-        return(act->data[act->usado]);
-    }else{
-        cout << "No hay datos";
-        return(0);
+        if (RN != Head){
+            cout << "c";
+            CTree();
+        }
     }
+    return(out);
 }
