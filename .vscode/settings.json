@@ -5,7 +5,9 @@
         "array": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "ostream": "cpp",
+        "*.tcc": "cpp"
     },
     "cmake.configureOnOpen": true
 }

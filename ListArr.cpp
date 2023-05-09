@@ -47,11 +47,9 @@ void ListArr<T>::CTree(){
         temp = Nqueue.front();
         Nqueue.pop();
         temp->Left = First;
-        cout << temp->Left->usado << endl;
         First = First->next;
         temp->Right = First;
         if (First != nullptr){
-            cout << temp->Right->usado << endl;
             First = First->next;
         }
     }
@@ -60,7 +58,6 @@ void ListArr<T>::CTree(){
 template<typename T>
 void ListArr<T>::CTreehelp(ResumeNode* RN, int i){
     if (i>1){
-        cout << "HELP???";
         ResumeNode* R = new ResumeNode();
         ResumeNode* L = new ResumeNode();
         RN->RightR = R;
@@ -73,15 +70,12 @@ void ListArr<T>::CTreehelp(ResumeNode* RN, int i){
 template<typename T>
 queue<typename ListArr<T>::ResumeNode*> ListArr<T>::CTreeFreeRN(ResumeNode* RN, queue<ResumeNode*> NQ){
     if (RN->LeftR != nullptr){
-        cout << "d";
         NQ = CTreeFreeRN(RN->LeftR, NQ);
     }
     if (RN->RightR != nullptr){
-        cout << "e";
         NQ = CTreeFreeRN(RN->RightR, NQ);
     }
     if (RN->RightR == nullptr){
-        cout << "f";
         NQ.push(RN);
     }
     return(NQ);
@@ -95,16 +89,12 @@ void ListArr<T>::CTreeAsign(ResumeNode* RN){
         CTreeAsign(RN->RightR);
     }
     if (RN->Left != nullptr){
-        cout << RN->usado <<" "<<RN->capacidad<<endl;
         RN->usado = RN->usado + RN->Left->usado;
         RN->capacidad = RN->capacidad + RN->Left->capacidad;
-        cout << RN->usado <<" "<<RN->capacidad<<endl;
     }
     if (RN->Right != nullptr){
-        cout << RN->usado <<" "<<RN->capacidad<<endl;
         RN->usado = RN->usado + RN->Right->usado;
         RN->capacidad = RN->capacidad + RN->Right->capacidad;
-        cout << RN->usado <<" "<<RN->capacidad<<endl;
     }    
     if (RN->LeftR != nullptr){
         RN->usado = RN->usado + RN->LeftR->usado;
@@ -261,6 +251,7 @@ void ListArr<T>::insert(T v, int i){
                     temp2->data[j] = temp2->data[j-1];
                 }
                 temp2->data[i] = v;
+                CTree();
             }else{         
                 Node* newNode = new Node(capacity);
                 newNode->next = temp2->next;
@@ -335,9 +326,11 @@ T ListArr<T>::delete_left(){
         }
     }else{        
         out = act->data[0];
-        RN->Left = RN->Right;
-        delete act;
-        CTree();
+        if (RN->Right != nullptr){
+            RN->Left = RN->Right;
+            delete act;
+            CTree();
+        }
     }
     return(out);
 }
@@ -377,12 +370,10 @@ T ListArr<T>::delete_right(){
                 Node* First;
                 ResumeNode* tempRN = Head;
                 while (tempRN->LeftR != nullptr){
-                    cout << "a";
                     tempRN = tempRN->LeftR;
                 }
                 First = tempRN->Left;
                 while (First->next!=act){
-                    cout << "b";
                     First = First->next;
                 }
                 First->next = nullptr;
@@ -390,9 +381,55 @@ T ListArr<T>::delete_right(){
             }
         }
         if (RN != Head){
-            cout << "c";
             CTree();
         }
     }
     return(out);
+}
+template<typename T>
+int ListArr<T>::sizeofListArr(){
+    int sizeLA = sizeofListArrAsist(Head);
+    sizeLA = sizeLA + sizeof(Head->capacidad) + sizeof(Head->usado) + sizeof(Head->Left) + sizeof(Head->LeftR) + sizeof(Head->Right) + sizeof(Head->RightR) + sizeof(capacity) + sizeof(Head);
+    return(sizeLA);
+}
+template<typename T>
+int ListArr<T>::sizeofListArrAsist(ResumeNode* RN){
+    int sizeLA = 0;
+    if (RN->LeftR != nullptr){
+        sizeLA = sizeLA + sizeofListArrAsist(RN->LeftR);
+        sizeLA = sizeLA + sizeof(RN->LeftR->Right);
+        sizeLA = sizeLA + sizeof(RN->LeftR->Left);
+        sizeLA = sizeLA + sizeof(RN->LeftR->RightR);
+        sizeLA = sizeLA + sizeof(RN->LeftR->LeftR);
+        sizeLA = sizeLA + sizeof(RN->LeftR->capacidad);
+        sizeLA = sizeLA + sizeof(RN->LeftR->usado);
+    }
+    if (RN->RightR != nullptr){
+        sizeLA = sizeLA + sizeofListArrAsist(RN->RightR);
+        sizeLA = sizeLA + sizeof(RN->RightR->Right);
+        sizeLA = sizeLA + sizeof(RN->RightR->Left);
+        sizeLA = sizeLA + sizeof(RN->RightR->RightR);
+        sizeLA = sizeLA + sizeof(RN->RightR->LeftR);
+        sizeLA = sizeLA + sizeof(RN->RightR->capacidad);
+        sizeLA = sizeLA + sizeof(RN->RightR->usado);
+    }
+    if (RN->Left != nullptr){
+        for (int i = 0; i < RN->Left->capacidad; i++){
+            sizeLA = sizeLA + sizeof(RN->Left->data[i]);
+        }
+        sizeLA = sizeLA + sizeof(RN->Left->capacidad);
+        sizeLA = sizeLA + sizeof(RN->Left->usado);
+        sizeLA = sizeLA + sizeof(RN->Left->next);
+    }
+    if (RN->Right != nullptr){
+        for (int i = 0; i < RN->Right->capacidad; i++){
+            sizeLA = sizeLA + sizeof(RN->Right->data[i]);
+        }
+        sizeLA = sizeLA + sizeof(RN->Right->data);
+        sizeLA = sizeLA + sizeof(RN->Right->capacidad);
+        sizeLA = sizeLA + sizeof(RN->Right->usado);
+        sizeLA = sizeLA + sizeof(RN->Right->next);
+    }
+    return(sizeLA);
+    
 }
